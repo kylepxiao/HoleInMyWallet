@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "944376703164",
+    "firebase_url": "https://holeinmywallet-dd0f4.firebaseio.com",
+    "project_id": "holeinmywallet-dd0f4",
+    "storage_bucket": "holeinmywallet-dd0f4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944376703164:android:b5877e53c3741730",
+        "android_client_info": {
+          "package_name": "com.example.kpx.holeinmywallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944376703164-m75nqpd2i1glmjf1gvjeahk9cr06ufa8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kpx.holeinmywallet",
+            "certificate_hash": "f863e0dc571e7d323b1c55fe36edc94a8aae8fbe"
+          }
+        },
+        {
+          "client_id": "944376703164-6ae2iku1q790915o2urc00ij0l6gqd7o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSPxRqzwHT1nBz_8GzFAU2QcbqeypGolQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944376703164-6ae2iku1q790915o2urc00ij0l6gqd7o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
