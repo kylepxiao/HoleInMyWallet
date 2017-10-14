@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +23,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.okhttp.internal.Util;
 
 import org.json.JSONObject;
 
@@ -29,13 +33,9 @@ import java.util.Map;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
-    /*
-    TODO: Setup firebase authentication and database
-    TODO: Validate entered information
-     */
-
     private EditText emailField, passwordField, confirmPasswordField, accountIdField;
     private FirebaseAuth authentication;
+    private FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,25 +50,39 @@ public class CreateAccountActivity extends AppCompatActivity {
 
         authentication = FirebaseAuth.getInstance();
         authentication.signOut();
+
+        database = FirebaseDatabase.getInstance();
     }
 
     public void createAccount(View view) {
+
         if (verifyFields()) {
             Log.d("Login", "Fields verified");
-            authentication.createUserWithEmailAndPassword(emailField.toString(), passwordField.toString()).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            authentication.createUserWithEmailAndPassword(emailField.getText().toString(), passwordField.getText().toString())
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Log.d("Login", "Success");
-                                setResult(1);
+
+                                //Add account ID to database
+                                database.getReference().child(Utility.replaceDotsWithEquals(
+                                        emailField.getText().toString())).setValue(
+                                        accountIdField.getText().toString()
+                                );
+                                returnToLogin(1);
                             } else {
-                                setResult(0);
-                                Log.d("Login", "Failed");
+                                Log.d("Login", "Failure: " + task.getException().getMessage());
+                                returnToLogin(0);
                             }
                         }
                     });
-            finish();
         }
+    }
+
+    private void returnToLogin(int resultCode) {
+        setResult(resultCode);
+        finish();
     }
 
     private boolean verifyFields() {
@@ -96,7 +110,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             valid = false;
             accountIdField.setError("ID must consist of numbers only");
         }
-        if (accountId.length() < -1) {
+        if (accountId.length() != 24) {
             valid = false;
             accountIdField.setError("ID must be 24 digits long");
         }
