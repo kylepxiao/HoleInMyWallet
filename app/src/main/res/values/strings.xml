@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Hole in my Wallet</string>
+    <string name="title_activity_create_account">CreateAccountActivity</string>
 </resources>
