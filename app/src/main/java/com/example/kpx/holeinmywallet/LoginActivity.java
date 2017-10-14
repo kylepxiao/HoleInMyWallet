@@ -30,6 +30,9 @@ public class LoginActivity extends AppCompatActivity {
         passwordField = (EditText)findViewById(R.id.login_password_field);
 
         authentication = FirebaseAuth.getInstance();
+
+        Intent intent = new Intent(this, MapVisualization.class);
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
     public void launchCreateAccount(View view) {

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.kpx.holeinmywallet">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +20,20 @@
         <activity
             android:name=".CreateAccountActivity"
             android:label="@string/title_activity_create_account"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".MapVisualization"
+            android:label="@string/title_activity_map_visualization"
             android:theme="@style/AppTheme"></activity>
+        <permission
+            android:name="com.example.mapexdemo.permission.MAPS_RECEIVE"
+            android:protectionLevel="signature" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC23bGVdeYZSm6W-Ijh-RrRtP8FwSyoags"/>
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>
