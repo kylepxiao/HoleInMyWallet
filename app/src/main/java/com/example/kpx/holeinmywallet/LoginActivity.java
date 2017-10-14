@@ -31,7 +31,8 @@ public class LoginActivity extends AppCompatActivity {
 
         authentication = FirebaseAuth.getInstance();
 
-        launchMainActivity();
+        Intent intent = new Intent(this, MapVisualization.class);
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
     public void launchCreateAccount(View view) {
@@ -42,10 +43,6 @@ public class LoginActivity extends AppCompatActivity {
     public void signIn(View view) {
         String email = emailField.getText().toString();
         String password = passwordField.getText().toString();
-        if (email.equals("") || password.equals("")) {
-            Toast.makeText(getApplicationContext(), "Could not sign in", Toast.LENGTH_LONG).show();
-            return;
-        }
         authentication.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -60,9 +57,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void launchMainActivity() {
-        //Toast.makeText(getApplicationContext(), "Successfully signed in user: " + authentication.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(this, MapVisualization.class);
-        startActivityForResult(intent, REQUEST_CODE);
+        Toast.makeText(getApplicationContext(), "Successfully signed in user: " + authentication.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
+
     }
 
     @Override

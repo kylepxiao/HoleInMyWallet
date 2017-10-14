@@ -1,116 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/mainFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="93dp"
-        app:backgroundTint="@color/colorPrimary"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:srcCompat="@android:drawable/ic_menu_mapmode" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/historyFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="12dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:alpha="0"
-        app:backgroundTint="@color/colorPrimary"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/mainFab"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toLeftOf="@+id/mainFab"
-        app:layout_constraintRight_toRightOf="@+id/mainFab"
-        app:srcCompat="@android:drawable/ic_menu_mapmode" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/weightedHistoryFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="0dp"
-        android:alpha="0"
-        app:backgroundTint="@color/colorYellow"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/historyFab"
-        app:layout_constraintLeft_toLeftOf="@+id/historyFab"
-        app:layout_constraintRight_toRightOf="@+id/historyFab"
-        app:srcCompat="@android:drawable/ic_menu_mapmode" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/heatMapFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_marginBottom="12dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:alpha="0"
-        app:backgroundTint="@color/colorRed"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/weightedHistoryFab"
-        app:layout_constraintLeft_toLeftOf="@+id/weightedHistoryFab"
-        app:layout_constraintRight_toRightOf="@+id/weightedHistoryFab"
-        app:srcCompat="@android:drawable/ic_menu_mapmode" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/recommendationsFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="12dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:alpha="0"
-        app:backgroundTint="@color/colorBlue"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/heatMapFab"
-        app:layout_constraintLeft_toLeftOf="@+id/heatMapFab"
-        app:layout_constraintRight_toRightOf="@+id/heatMapFab"
-        app:srcCompat="@android:drawable/ic_menu_mapmode" />
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
     <include
-        layout="@layout/content_map_visualization"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="0dp"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.0" />
+        layout="@layout/app_bar_map_visualization"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/textView4"
+    <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="392dp"
+        android:layout_height="515dp"
+        tools:context="com.example.mapwithmarker.MapsMarkerActivity"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="8dp" /> -->
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
-        android:backgroundTint="@android:color/background_dark"
-        android:backgroundTintMode="src_over"
-        android:text="TextView"
-        app:layout_constraintRight_toLeftOf="@+id/recommendationsFab"
-        tools:layout_editor_absoluteY="289dp" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_map_visualization"
+        app:menu="@menu/activity_map_visualization_drawer" />
 
-</android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.DrawerLayout>

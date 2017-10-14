@@ -5,8 +5,4 @@
     <color name="colorPrimaryLight">#60c666</color>
     <color name="colorAccent">#d2d2d2</color>
     <color name="colorTitle">#000000</color>
-
-    <color name="colorRed">#ff0000</color>
-    <color name="colorBlue">#0015ff</color>
-    <color name="colorYellow">#ffd900</color>
 </resources>
