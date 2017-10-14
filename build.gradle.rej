@@ -1,0 +1,14 @@
+diff a/build.gradle b/build.gradle	(rejected hunks)
+@@ -16,12 +16,7 @@
+ allprojects {
+     repositories {
+         jcenter()
+-
+-        maven {
+-            url "https://maven.google.com" // Google's Maven repository
+-        }
+     }
+-
+ }
+ 
+ task clean(type: Delete) {
