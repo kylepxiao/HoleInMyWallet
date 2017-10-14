@@ -1,5 +1,6 @@
 package com.example.kpx.holeinmywallet;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,38 +22,108 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapVisualization extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback{
+        implements OnMapReadyCallback{
+
+    private FloatingActionButton main, history, weightedHistory, heatMap, recommendations;
+
+    private boolean buttonsToggled = false;
+
+    private enum DisplayMode{
+        HISTORY,
+        WEIGHTED_HISTORY,
+        HEAT_MAP,
+        RECOMMENDATIONS
+    }
+    DisplayMode displayMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_visualization);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        main = (FloatingActionButton) findViewById(R.id.mainFab);
+        history = (FloatingActionButton) findViewById(R.id.historyFab);
+        weightedHistory = (FloatingActionButton) findViewById(R.id.weightedHistoryFab);
+        heatMap = (FloatingActionButton) findViewById(R.id.heatMapFab);
+        recommendations = (FloatingActionButton) findViewById(R.id.recommendationsFab);
+
+        main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                toggleButtons();
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayMode = DisplayMode.HISTORY;
+                toggleButtons();
+                updateMainButton();
+            }
+        });
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        weightedHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayMode = DisplayMode.WEIGHTED_HISTORY;
+                toggleButtons();
+                updateMainButton();
+            }
+        });
+
+        heatMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayMode = DisplayMode.HEAT_MAP;
+                toggleButtons();
+                updateMainButton();
+            }
+        });
+
+        recommendations.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayMode = DisplayMode.RECOMMENDATIONS;
+                toggleButtons();
+                updateMainButton();
+            }
+        });
 
         // Get the SupportMapFragment and request notification
         // when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void toggleButtons() {
+        buttonsToggled = !buttonsToggled;
+        history.setAlpha(buttonsToggled ? 1f : 0f);
+        history.setClickable(buttonsToggled);
+        weightedHistory.setAlpha(buttonsToggled ? 1f : 0f);
+        weightedHistory.setClickable(buttonsToggled);
+        heatMap.setAlpha(buttonsToggled ? 1f : 0f);
+        heatMap.setClickable(buttonsToggled);
+        recommendations.setAlpha(buttonsToggled ? 1f : 0f);
+        recommendations.setClickable(buttonsToggled);
+    }
+
+    private void updateMainButton() {
+        switch(displayMode) {
+            default:
+                main.setBackgroundTintList(history.getBackgroundTintList());
+                break;
+            case WEIGHTED_HISTORY:
+                main.setBackgroundTintList(weightedHistory.getBackgroundTintList());
+                break;
+            case HEAT_MAP:
+                main.setBackgroundTintList(heatMap.getBackgroundTintList());
+                break;
+            case RECOMMENDATIONS:
+                main.setBackgroundTintList(recommendations.getBackgroundTintList());
+                break;
+        }
     }
 
     @Override
@@ -63,62 +134,5 @@ public class MapVisualization extends AppCompatActivity
         googleMap.addMarker(new MarkerOptions().position(sydney)
                 .title("Marker in Sydney"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.map_visualization, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 }
