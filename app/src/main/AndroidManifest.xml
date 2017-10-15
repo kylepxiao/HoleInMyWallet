@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <permission
+        android:name="com.example.mapexdemo.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
@@ -31,10 +34,6 @@
             android:name=".MapVisualization"
             android:label="@string/title_activity_map_visualization"
             android:theme="@style/AppTheme" />
-
-        <permission
-            android:name="com.example.mapexdemo.permission.MAPS_RECEIVE"
-            android:protectionLevel="signature" />
 
         <meta-data
             android:name="com.google.android.gms.version"
