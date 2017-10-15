@@ -109,8 +109,23 @@ public class MapVisualization extends AppCompatActivity
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.getValue(Integer.class) != null) {
+                        if(dataSnapshot.getValue(Long.class) != null) {
                             numberOfPoints = dataSnapshot.getValue(Long.class).intValue();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+        database.getReference().child("IDs").child(Utility.replaceDotsWithEquals(user.getEmail()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.getValue(String.class) != null) {
+                            accountID = dataSnapshot.getValue(String.class);
                         }
                     }
 
@@ -181,6 +196,8 @@ public class MapVisualization extends AppCompatActivity
             mOverlay.remove();
             heatData = new ArrayList<LatLng>();
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
                 return false;
             }
             mFusedLocationClient.getLastLocation()
