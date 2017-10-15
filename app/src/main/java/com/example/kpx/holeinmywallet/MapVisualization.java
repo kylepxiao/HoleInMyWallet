@@ -110,7 +110,7 @@ public class MapVisualization extends AppCompatActivity
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.getValue(Integer.class) != null) {
-                            numberOfPoints = dataSnapshot.getValue(Integer.class);
+                            numberOfPoints = dataSnapshot.getValue(Long.class).intValue();
                         }
                     }
 
