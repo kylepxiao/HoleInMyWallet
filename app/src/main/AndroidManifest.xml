@@ -13,7 +13,8 @@
         <activity android:name=".LoginActivity">
             <meta-data
                 android:name="com.google.android.gms.version"
-                android:value="@integer/google_play_services_version"/>
+                android:value="@integer/google_play_services_version" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,16 +28,27 @@
         <activity
             android:name=".MapVisualization"
             android:label="@string/title_activity_map_visualization"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+
         <permission
             android:name="com.example.mapexdemo.permission.MAPS_RECEIVE"
             android:protectionLevel="signature" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC23bGVdeYZSm6W-Ijh-RrRtP8FwSyoags"/>
+            android:value="AIzaSyC23bGVdeYZSm6W-Ijh-RrRtP8FwSyoags" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MapVisualization">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.kpx.holeinmywallet.MapVisualization" />
+        </activity>
     </application>
 
 </manifest>
