@@ -26,6 +26,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,24 +40,40 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import static com.example.kpx.holeinmywallet.R.id.numRecommendations;
+
 public class MapVisualization extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
-    public static GoogleMap mMap;
-    public static List<LatLng> points;
+    private GoogleMap mMap;
+    private List<LatLng> heatData;
+    private HeatmapTileProvider mProvider;
+    private TileOverlay mOverlay;
     private FusedLocationProviderClient mFusedLocationClient;
+    private int numberOfPoints = 20;
+    private String accountID;
+    private final String key = "0f030ef091420133d187099758681c3a";
+    private FirebaseDatabase database;
+    private FirebaseAuth authentication;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +98,27 @@ public class MapVisualization extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        accountID = "59e312a5ceb8abe24252f344";
+
+        database = FirebaseDatabase.getInstance();
+        authentication = FirebaseAuth.getInstance();
+        user = authentication.getCurrentUser();
+
+        database.getReference().child("NumRecommendations").child(Utility.replaceDotsWithEquals(user.getEmail()))
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.getValue(Integer.class) != null) {
+                            numberOfPoints = dataSnapshot.getValue(Integer.class);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     @Override
@@ -92,6 +130,10 @@ public class MapVisualization extends AppCompatActivity
         googleMap.addMarker(new MarkerOptions().position(sydney)
                 .title("Marker in Sydney"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        heatData = new ArrayList<LatLng>();
+        heatData.add(sydney);
+        addHeatMap(heatData);
     }
 
     @Override
@@ -136,12 +178,30 @@ public class MapVisualization extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.recommendations) {
             mMap.clear();
-            mapUserToItemRecommendations(10);
+            mOverlay.remove();
+            heatData = new ArrayList<LatLng>();
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+                                getNearbyMerchants(location, 5);
+                            }
+                        }
+                    });
             // Handle the camera action
         } else if (id == R.id.heatmap) {
-
+            heatMapUserHistory(numberOfPoints);
         } else if (id == R.id.history) {
-
+            mMap.clear();
+            mOverlay.remove();
+            heatData = new ArrayList<LatLng>();
+            mapUserHistory(numberOfPoints);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -149,13 +209,19 @@ public class MapVisualization extends AppCompatActivity
         return true;
     }
 
+    private String parseJSONToCSV(JSONArray array, String identifier) throws JSONException {
+        String temp = "";
+        for(int i = 0; i < array.length(); i++) {
+            temp += array.getJSONObject(i).get(identifier).toString() + ",";
+        }
+        return temp.substring(0, temp.length() - 1);
+    }
+
     private void addHeatMap(List<LatLng> list) {
         // Create a heat map tile provider, passing it the latlngs of the police stations.
-        TileProvider mProvider = new HeatmapTileProvider.Builder()
-                .data(list)
-                .build();
+        mProvider = new HeatmapTileProvider.Builder().data(list).radius(50).build();
         // Add a tile overlay to the map, using the heat map tile provider.
-        TileOverlay mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
     private void getNearbyMerchants(Location location, int radius) {
@@ -166,11 +232,7 @@ public class MapVisualization extends AppCompatActivity
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        try {
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng"))).title("name"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        mapUserToItemRecommendations(numberOfPoints, response);
                     }
                 }, new Response.ErrorListener() {
 
@@ -183,7 +245,7 @@ public class MapVisualization extends AppCompatActivity
         MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
-    private void mapUserToItemRecommendations(final int numResults) {
+    private void heatMapUserHistory(final int numResults) {
         final RequestQueue mRequestQueue = MySingleton.getInstance(this.getApplicationContext()).
                 getRequestQueue();
 
@@ -191,12 +253,87 @@ public class MapVisualization extends AppCompatActivity
         mRequestQueue.start();
 
         // URL request string
-        String url = "https://westus.api.cognitive.microsoft.com/recommendations/v4.0/models/54d982ff-b237-43e2-81d5-10d5d377c3fa/recommend/user?userId=59e2c887ceb8abe24252d812&numberOfResults=" + numResults;
+        String url = "http://api.reimaginebanking.com/accounts/" + accountID + "/purchases?key=" + key;
+
+        // Request a string response from the provided URL.
+        JsonArrayRequest jsArrRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        for(int i = 0; i < Math.min(response.length(), numResults); i++) {
+                            try {
+                                heatMapMerchant(response.getJSONObject(i).get("merchant_id").toString(), mRequestQueue);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error", "Error with JSON Volley response");
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        MySingleton.getInstance(this).addToRequestQueue(jsArrRequest);
+    }
+
+    private void mapUserHistory(final int numResults) {
+        final RequestQueue mRequestQueue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+
+        // Start the queue
+        mRequestQueue.start();
+
+        // URL request string
+        String url = "http://api.reimaginebanking.com/accounts/" + accountID + "/purchases?key=" + key;
+
+        // Request a string response from the provided URL.
+        JsonArrayRequest jsArrRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        for(int i = 0; i < Math.min(response.length(), numResults); i++) {
+                            try {
+                                mapMerchant(response.getJSONObject(i).get("merchant_id").toString(), mRequestQueue);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error", "Error with JSON Volley response");
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        MySingleton.getInstance(this).addToRequestQueue(jsArrRequest);
+    }
+
+    private void mapUserToItemRecommendations(final int numResults, JSONObject merchants) {
+        final RequestQueue mRequestQueue = MySingleton.getInstance(this.getApplicationContext()).
+                getRequestQueue();
+
+        // Start the queue
+        mRequestQueue.start();
+
+        // URL request string
+        String url = "https://westus.api.cognitive.microsoft.com/recommendations/v4.0/models/54d982ff-b237-43e2-81d5-10d5d377c3fa/recommend/user?userId=" + accountID + "&numberOfResults=" + numResults;
 
         // Request a string response from the provided URL.
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("includeMetaData", "false");
         parameters.put("buildId", "1661103");
+        try {
+            parameters.put("itemsIds", parseJSONToCSV(merchants.getJSONArray("data"), "_id"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, new JSONObject(parameters), new Response.Listener<JSONObject>() {
                     @Override
@@ -208,7 +345,7 @@ public class MapVisualization extends AppCompatActivity
                                 //mMap.addMarker(new MarkerOptions().position(new LatLng(-33.852 + i, 151.211)).title(recommendedItems.getJSONObject(i).getJSONArray("items").getJSONObject(0).get("name").toString()));
                                 String id = recommendedItems.getJSONObject(i).getJSONArray("items").getJSONObject(0).get("id").toString();
                                 String name = recommendedItems.getJSONObject(i).getJSONArray("items").getJSONObject(0).get("name").toString();
-                                mapMerchant(id, name, mRequestQueue);
+                                mapMerchant(id, mRequestQueue);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -233,9 +370,9 @@ public class MapVisualization extends AppCompatActivity
         MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
-    private void mapMerchant(String id, final String name, RequestQueue mRequestQueue){
+    private void mapMerchant(String id, RequestQueue mRequestQueue){
         // URL request string
-        String url = "http://api.reimaginebanking.com/enterprise/merchants/" + id + "?key=faa42463727cc73a03c766e63a424800";
+        String url = "http://api.reimaginebanking.com/enterprise/merchants/" + id + "?key=" + key;
 
         // Request a string response from the provided URL.
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
@@ -243,7 +380,41 @@ public class MapVisualization extends AppCompatActivity
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng"))).title(name));
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng"))).title(response.get("name").toString()));
+                            /*heatData.add(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng")));
+                            mProvider.setData(heatData);
+                            mOverlay.clearTileCache();
+                            addHeatMap(heatData);*/
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error", "Error with JSON Volley response");
+                    }
+                });
+        // Add the request to the RequestQueue.
+        MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+    }
+
+    private void heatMapMerchant(String id, RequestQueue mRequestQueue){
+        // URL request string
+        String url = "http://api.reimaginebanking.com/enterprise/merchants/" + id + "?key=" + key;
+
+        // Request a string response from the provided URL.
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng"))).title(response.get("name").toString()));
+                            heatData.add(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng")));
+                            mProvider.setData(heatData);
+                            mOverlay.clearTileCache();
+                            addHeatMap(heatData);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
