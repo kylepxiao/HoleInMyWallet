@@ -197,7 +197,7 @@ public class MapVisualization extends AppCompatActivity
         mRequestQueue.start();
 
         // URL request string
-        String url = "https://westus.api.cognitive.microsoft.com/recommendations/v4.0/models/54d982ff-b237-43e2-81d5-10d5d377c3fa/recommend/user?userId=59e2c6c1ceb8abe24252cd0b&numberOfResults=" + numResults;
+        String url = "https://westus.api.cognitive.microsoft.com/recommendations/v4.0/models/54d982ff-b237-43e2-81d5-10d5d377c3fa/recommend/user?userId=59e2c887ceb8abe24252d812&numberOfResults=" + numResults;
 
         // Request a string response from the provided URL.
         HashMap<String, String> parameters = new HashMap<String, String>();

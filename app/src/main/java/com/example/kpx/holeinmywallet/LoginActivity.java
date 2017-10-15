@@ -31,6 +31,9 @@ public class LoginActivity extends AppCompatActivity {
 
         authentication = FirebaseAuth.getInstance();
         authentication.signOut();
+
+        Intent intent = new Intent(this, MapVisualization.class);
+        startActivityForResult(intent, REQUEST_CODE);
     }
 
     public void launchCreateAccount(View view) {
