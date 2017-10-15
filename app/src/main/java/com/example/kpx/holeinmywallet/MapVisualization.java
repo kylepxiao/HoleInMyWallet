@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -48,6 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MapVisualization extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
@@ -61,15 +64,6 @@ public class MapVisualization extends AppCompatActivity
         setContentView(R.layout.activity_map_visualization);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -126,7 +120,10 @@ public class MapVisualization extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            startActivity(new Intent(this, SettingsActivity.class));
+        } else if (id == R.id.logout) {
+            FirebaseAuth.getInstance().signOut();
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -139,19 +136,6 @@ public class MapVisualization extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.nav_camera) {
             mMap.clear();
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                // Logic to handle location object
-                            }
-                        }
-                    });
             mapUserToItemRecommendations(10);
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
@@ -189,7 +173,7 @@ public class MapVisualization extends AppCompatActivity
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng"))).title(name));
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(response.getJSONObject("geocode").getDouble("lat"), response.getJSONObject("geocode").getDouble("lng"))).title("name"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

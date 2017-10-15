@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
-    static final int REQUEST_CODE = 1;
+    static final int REQUEST_CODE = 11;
 
     EditText emailField, passwordField;
 
@@ -30,9 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordField = (EditText)findViewById(R.id.login_password_field);
 
         authentication = FirebaseAuth.getInstance();
-
-        Intent intent = new Intent(this, MapVisualization.class);
-        startActivityForResult(intent, REQUEST_CODE);
+        authentication.signOut();
     }
 
     public void launchCreateAccount(View view) {
@@ -57,8 +55,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void launchMainActivity() {
-        Toast.makeText(getApplicationContext(), "Successfully signed in user: " + authentication.getCurrentUser().getUid(), Toast.LENGTH_LONG).show();
-
+        Toast.makeText(getApplicationContext(), "Successfully signed in user: " + authentication.getCurrentUser().getEmail(), Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, MapVisualization.class);
+        startActivity(intent);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
             if (resultCode == 1) {
                 //Success
                 Toast.makeText(getApplicationContext(), "Successfully created account", Toast.LENGTH_LONG).show();
-            } else {
+            } else if (resultCode == 2) {
                 Toast.makeText(getApplicationContext(), "Could not create account", Toast.LENGTH_LONG).show();
             }
         }
