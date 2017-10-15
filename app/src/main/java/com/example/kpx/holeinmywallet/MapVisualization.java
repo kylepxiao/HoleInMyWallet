@@ -99,7 +99,7 @@ public class MapVisualization extends AppCompatActivity
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        accountID = "59e312a5ceb8abe24252f344";
+        accountID = "59e353d2ceb8abe24252fbc3";
 
         database = FirebaseDatabase.getInstance();
         authentication = FirebaseAuth.getInstance();
@@ -126,9 +126,9 @@ public class MapVisualization extends AppCompatActivity
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
         mMap = googleMap;
-        LatLng sydney = new LatLng(-33.852, 151.211);
+        LatLng sydney = new LatLng(33.7490, -84.3880);
         googleMap.addMarker(new MarkerOptions().position(sydney)
-                .title("Marker in Sydney"));
+                .title("Current Course Location"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         heatData = new ArrayList<LatLng>();
